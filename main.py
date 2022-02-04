@@ -146,6 +146,8 @@ counter_down=0
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
+st.title("Webcam Application")
+
 class VideoTransformer(VideoTransformerBase):
             
         def headpose():
@@ -321,9 +323,9 @@ class VideoTransformer(VideoTransformerBase):
                 #cv2.imshow('Head Pose Estimation', image)
                 return image
     
- webrtc_ctx = webrtc_streamer(key="Blazepose", mode=WebRtcMode.SENDRECV, client_settings=WEBRTC_CLIENT_SETTINGS, video_transformer_factory=VideoTransformer,async_transform=True,)
+  webrtc_ctx = webrtc_streamer(key="Blazepose", mode=WebRtcMode.SENDRECV, client_settings=WEBRTC_CLIENT_SETTINGS, video_transformer_factory=VideoTransformer,async_transform=True,)
 
-st.title("Webcam Application")
+
 
 # webrtc_streamer(
 #         key="headpose",
