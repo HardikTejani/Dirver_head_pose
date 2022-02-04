@@ -7,6 +7,20 @@ import pyttsx3
 import pygame 
 from pygame import mixer
 from streamlit_webrtc import webrtc_streamer
+
+from streamlit_webrtc import (
+    AudioProcessorBase,
+    RTCConfiguration,
+    VideoProcessorBase,
+    WebRtcMode,
+    webrtc_streamer,
+)
+
+RTC_CONFIGURATION = RTCConfiguration(
+    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+)
+
+
 # pygame.init()
 # pygame.mixer.init()
 # voice_left = mixer.Sound('left.wav')
@@ -18,8 +32,14 @@ from streamlit_webrtc import webrtc_streamer
 
 st.title("Webcam Application")
 
-webrtc_streamer(key="example")
-
+webrtc_streamer(
+        key="object-detection",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration=RTC_CONFIGURATION,
+        video_processor_factory=MobileNetSSDVideoProcessor,
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True,
+    )
 
 # run = st.checkbox('Run')
 # FRAME_WINDOW = st.image([])
