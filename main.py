@@ -9,10 +9,10 @@ from pygame import mixer
 
 mixer.init()
 voice_left = mixer.Sound('left.wav')
-voice_right = mixer.Sound('Right.wav')
-voice_down = mixer.Sound('down.wav')
-eyes_blink= mixer.Sound('eyes_blink.wav')
-yawn = mixer.Sound('Yawning.wav')
+# voice_right = mixer.Sound('Right.wav')
+# voice_down = mixer.Sound('down.wav')
+# eyes_blink= mixer.Sound('eyes_blink.wav')
+# yawn = mixer.Sound('Yawning.wav')
 
 
 st.title("Webcam Application")
