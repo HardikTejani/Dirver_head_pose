@@ -1,1 +1,5 @@
 libsdl-mixer1.2
+libSDL-1.2
+libSDL-devel
+libSDL-image-1.2
+libSDL-ttf-2
