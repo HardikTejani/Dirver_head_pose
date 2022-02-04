@@ -8,19 +8,30 @@ import pygame
 from pygame import mixer
 from streamlit_webrtc import webrtc_streamer
 
+# from streamlit_webrtc import (
+#     AudioProcessorBase,
+#     RTCConfiguration,
+#     VideoProcessorBase,
+#     WebRtcMode,
+#     webrtc_streamer,
+# )
+
+# RTC_CONFIGURATION = RTCConfiguration(
+#     {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+# )
+
 from streamlit_webrtc import (
     AudioProcessorBase,
-    RTCConfiguration,
-    VideoProcessorBase,
+    ClientSettings,
+    VideoTransformerBase,
     WebRtcMode,
     webrtc_streamer,
 )
 
-RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-)
-
-
+WEBRTC_CLIENT_SETTINGS = ClientSettings(
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        media_stream_constraints={"video": True, "audio": False},
+    )
 # pygame.init()
 # pygame.mixer.init()
 # voice_left = mixer.Sound('left.wav')
@@ -135,7 +146,7 @@ counter_down=0
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
-class VideoTransformer(VideoProcessorBase):
+class VideoTransformer(VideoTransformerBase):
             
         def headpose():
             cap = cv2.VideoCapture(0)                   
@@ -313,14 +324,17 @@ class VideoTransformer(VideoProcessorBase):
         
 st.title("Webcam Application")
 
-webrtc_streamer(
-        key="headpose",
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration=RTC_CONFIGURATION,
-        video_processor_factory=VideoTransformer,
-        media_stream_constraints={"video": True, "audio": False},
-        async_processing=True,
-    )
+# webrtc_streamer(
+#         key="headpose",
+#         mode=WebRtcMode.SENDRECV,
+#         rtc_configuration=RTC_CONFIGURATION,
+#         video_processor_factory=VideoTransformer,
+#         media_stream_constraints={"video": True, "audio": False},
+#         async_processing=True,
+#     )
+
+    webrtc_ctx = webrtc_streamer(key="Blazepose", mode=WebRtcMode.SENDRECV, client_settings=WEBRTC_CLIENT_SETTINGS, video_transformer_factory=VideoTransformer,async_transform=True,)
+
 
 # run = st.checkbox('Run')
 # FRAME_WINDOW = st.image([])
