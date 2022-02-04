@@ -7,7 +7,8 @@ import pyttsx3
 import pygame 
 from pygame import mixer
 
-mixer.init()
+pygame.init()
+pygame.mixer.init()
 voice_left = mixer.Sound('left.wav')
 # voice_right = mixer.Sound('Right.wav')
 # voice_down = mixer.Sound('down.wav')
