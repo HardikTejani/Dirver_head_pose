@@ -139,175 +139,175 @@ class VideoTransformer(VideoTransformerBase):
             
         def headpose():
             cap = cv2.VideoCapture(0)                   
-                while cap.isOpened():
-                    #ret, frame = cap.read()
-                    success, image = cap.read()
-                    
-                    image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
+            while cap.isOpened():
+                #ret, frame = cap.read()
+                success, image = cap.read()
 
-                    # To improve performance
-                    image.flags.writeable = False
+                image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
 
-                    # Get the result
-                    results = face_mesh.process(image)
+                # To improve performance
+                image.flags.writeable = False
 
-                    # To improve performance
-                    image.flags.writeable = True
+                # Get the result
+                results = face_mesh.process(image)
 
-                    # Convert the color space from RGB to BGR
-                    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                # To improve performance
+                image.flags.writeable = True
 
-                    img_h, img_w, img_c = image.shape
-                    face_3d = []
-                    face_2d = []
+                # Convert the color space from RGB to BGR
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-                    if results.multi_face_landmarks:
-                        for face_landmarks in results.multi_face_landmarks:
-                            for idx, lm in enumerate(face_landmarks.landmark):
-                                if idx == 33 or idx == 263 or idx == 1 or idx == 61 or idx == 291 or idx == 199:
-                                    if idx == 1:
-                                        nose_2d = (lm.x * img_w, lm.y * img_h)
-                                        nose_3d = (lm.x * img_w, lm.y * img_h, lm.z * 8000)
+                img_h, img_w, img_c = image.shape
+                face_3d = []
+                face_2d = []
 
-                                    x, y = int(lm.x * img_w), int(lm.y * img_h)
+                if results.multi_face_landmarks:
+                    for face_landmarks in results.multi_face_landmarks:
+                        for idx, lm in enumerate(face_landmarks.landmark):
+                            if idx == 33 or idx == 263 or idx == 1 or idx == 61 or idx == 291 or idx == 199:
+                                if idx == 1:
+                                    nose_2d = (lm.x * img_w, lm.y * img_h)
+                                    nose_3d = (lm.x * img_w, lm.y * img_h, lm.z * 8000)
 
-                                    # Get the 2D Coordinates
-                                    face_2d.append([x, y])
+                                x, y = int(lm.x * img_w), int(lm.y * img_h)
 
-                                    # Get the 3D Coordinates
-                                    face_3d.append([x, y, lm.z])       
+                                # Get the 2D Coordinates
+                                face_2d.append([x, y])
 
-                            # Convert it to the NumPy array
-                            face_2d = np.array(face_2d, dtype=np.float64)
+                                # Get the 3D Coordinates
+                                face_3d.append([x, y, lm.z])       
 
-                            # Convert it to the NumPy array
-                            face_3d = np.array(face_3d, dtype=np.float64)
+                        # Convert it to the NumPy array
+                        face_2d = np.array(face_2d, dtype=np.float64)
 
-                            # The camera matrix
-                            focal_length = 1 * img_w
+                        # Convert it to the NumPy array
+                        face_3d = np.array(face_3d, dtype=np.float64)
 
-                            cam_matrix = np.array([ [focal_length, 0, img_h / 2],
-                                                    [0, focal_length, img_w / 2],
-                                                    [0, 0, 1]])
+                        # The camera matrix
+                        focal_length = 1 * img_w
 
-                            # The Distance Matrix
-                            dist_matrix = np.zeros((4, 1), dtype=np.float64)
+                        cam_matrix = np.array([ [focal_length, 0, img_h / 2],
+                                                [0, focal_length, img_w / 2],
+                                                [0, 0, 1]])
 
-                            # Solve PnP
-                            success, rot_vec, trans_vec = cv2.solvePnP(face_3d, face_2d, cam_matrix, dist_matrix)
+                        # The Distance Matrix
+                        dist_matrix = np.zeros((4, 1), dtype=np.float64)
 
-                            # Get rotational matrix
-                            rmat, jac = cv2.Rodrigues(rot_vec)
+                        # Solve PnP
+                        success, rot_vec, trans_vec = cv2.solvePnP(face_3d, face_2d, cam_matrix, dist_matrix)
 
-                            # Get angles
-                            angles, mtxR, mtxQ, Qx, Qy, Qz = cv2.RQDecomp3x3(rmat)
+                        # Get rotational matrix
+                        rmat, jac = cv2.Rodrigues(rot_vec)
 
-                            # Get the y rotation degree
-                            x = angles[0] * 360
-                            y = angles[1] * 360
+                        # Get angles
+                        angles, mtxR, mtxQ, Qx, Qy, Qz = cv2.RQDecomp3x3(rmat)
 
-                            #Display the nose direction
-                #             nose_3d_projection, jacobian = cv2.projectPoints(nose_3d, rot_vec, trans_vec, cam_matrix, dist_matrix)
+                        # Get the y rotation degree
+                        x = angles[0] * 360
+                        y = angles[1] * 360
 
-                #             p1 = (int(nose_2d[0]), int(nose_2d[1]))
-                #             p2 = (int(nose_3d_projection[0][0][0]), int(nose_3d_projection[0][0][1]))
+                        #Display the nose direction
+            #             nose_3d_projection, jacobian = cv2.projectPoints(nose_3d, rot_vec, trans_vec, cam_matrix, dist_matrix)
 
-                #             cv2.line(image, p1, p2, (255, 0, 0), 2)
+            #             p1 = (int(nose_2d[0]), int(nose_2d[1]))
+            #             p2 = (int(nose_3d_projection[0][0][0]), int(nose_3d_projection[0][0][1]))
 
-                            # Add the text on the image
-                            if y< -10:
-                                text = "Looking Left"
-                                Counter_left += 1             
+            #             cv2.line(image, p1, p2, (255, 0, 0), 2)
 
-                            if y > 10:
-                                text = "Looking Right"
-                                Counter_right += 1
+                        # Add the text on the image
+                        if y< -10:
+                            text = "Looking Left"
+                            Counter_left += 1             
 
-                            if x < -10:
-                                text = "Looking Down"
-                                Counter_down += 1
+                        if y > 10:
+                            text = "Looking Right"
+                            Counter_right += 1
 
-                            else:
-                                text = "Looking Forward"
+                        if x < -10:
+                            text = "Looking Down"
+                            Counter_down += 1
 
-                #             colorBackgroundText(image,  f' You are : {text}', FONTS, 0.7, (30,30),2, PINK, YELLOW)
-                #             Threshold =  Threshold_Frame ./ 
+                        else:
+                            text = "Looking Forward"
 
-                            if Counter_left % Threshold_Frame[counter_left] == 0 and y< -10 and pygame.mixer.get_busy()==0:
-                                Counter_right=0
-                                Counter_down=0
-                                Counter_forward=0
+            #             colorBackgroundText(image,  f' You are : {text}', FONTS, 0.7, (30,30),2, PINK, YELLOW)
+            #             Threshold =  Threshold_Frame ./ 
 
-                                counter_left= 1 - counter_left  
-                                if counter_left == 0:
-                                    Counter_left = 0
-                                #cv2.putText(image, text, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                                #voice_left.play()
+                        if Counter_left % Threshold_Frame[counter_left] == 0 and y< -10 and pygame.mixer.get_busy()==0:
+                            Counter_right=0
+                            Counter_down=0
+                            Counter_forward=0
 
-
-
-                            if Counter_right % Threshold_Frame[counter_right] and y > 10 and pygame.mixer.get_busy()==0 and counter_right<2:
-                                i=1
-                                Counter_left=0
-                                Counter_down=0
-                                Counter_forward=0
-
-                                counter_right= 1 - counter_right  
-                                if counter_right == 0:
-                                    Counter_right = 0
-
-                                #cv2.putText(image, text, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                                #voice_right.play()
+                            counter_left= 1 - counter_left  
+                            if counter_left == 0:
+                                Counter_left = 0
+                            #cv2.putText(image, text, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            #voice_left.play()
 
 
-                            if Counter_down % Threshold_Frame[counter_down] and x < -10 and pygame.mixer.get_busy()==0 and counter_down<2:
-                                Counter_right=0
-                                Counter_left=0
-                                Counter_forward=0
 
-                                counter_down= 1 - counter_down  
-                                if counter_down == 0:
-                                    Counter_down = 0
+                        if Counter_right % Threshold_Frame[counter_right] and y > 10 and pygame.mixer.get_busy()==0 and counter_right<2:
+                            i=1
+                            Counter_left=0
+                            Counter_down=0
+                            Counter_forward=0
 
-                                #cv2.putText(image, text, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                                #voice_down.play()
+                            counter_right= 1 - counter_right  
+                            if counter_right == 0:
+                                Counter_right = 0
 
-                            frame_height, frame_width= image.shape[:2] 
+                            #cv2.putText(image, text, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            #voice_right.play()
 
-                            if results.multi_face_landmarks:
-                                mesh_coords = landmarksDetection(image, results, False)
-                                ratio = blinkRatio(image, mesh_coords, RIGHT_EYE, LEFT_EYE)
-                                Mouth_ratio= MouthRatio(image, mesh_coords, UPPER_LIPS, LOWER_LIPS)
-                                #cv2.putText(image, ratio, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                                #cv2.putText(frame, f'ratio {ratio}', (100, 100), FONTS, 1.0, utils.GREEN, 2)
-                                #colorBackgroundText(image,  f'Ratio: {round(ratio,2)}', FONTS, 0.7, (30,60),2, PINK, YELLOW)
-                                #colorBackgroundText(image,  f'Ratio Mouth: {round(Mouth_ratio,2)}', FONTS, 0.7, (30,120),2, PINK, YELLOW)
-                                #colorBackgroundText(image,  f'Main Counter: {counter} frames', FONTS, 0.7, (30,60),2, PINK, YELLOW)
-                                colorBackgroundText(image,  f'Eyes Clsoed for: {counter_eye} frames', FONTS, 0.7, (30,90),2, PINK, YELLOW)
-                                colorBackgroundText(image,  f'Mouth Open for: {counter_mouth} frames', FONTS, 0.7, (30,120),2, PINK, YELLOW)
-                                colorBackgroundText(image,  f'Seeing left for: {Counter_left} frames', FONTS, 0.7, (30,150),2, PINK, YELLOW)
-                                colorBackgroundText(image,  f'Seeing right for: {Counter_right} frames', FONTS, 0.7, (30,180),2, PINK, YELLOW)
-                                colorBackgroundText(image,  f'Seeing Down for : {Counter_down} frames', FONTS, 0.7, (30,210),2, PINK, YELLOW)
 
-                                if ratio >4.0:
-                                    counter_eye += 1
-                                    if counter_eye > 10 and pygame.mixer.get_busy()==0:
-                                        #eyes_blink.play()
-                                        colorBackgroundText(image,  f'Blink', FONTS, 1.7, (int(frame_height/2), 100), 2, YELLOW, pad_x=6, pad_y=6, )
-                                        counter_eye = 0
-                                else: 
-                                    counter_eye=0
-                                if Mouth_ratio < 1.5:
-                                    counter_mouth += 1
-                                    if counter_mouth > 50 and pygame.mixer.get_busy()==0:
-                                        #yawn.play()
-                                        colorBackgroundText(image,  f'Yawn', FONTS, 1.7, (int(frame_height/2), 100), 2, YELLOW, pad_x=6, pad_y=6, )
-                                        counter_mouth = 0
-                                else: 
-                                    counter_mouth=0
+                        if Counter_down % Threshold_Frame[counter_down] and x < -10 and pygame.mixer.get_busy()==0 and counter_down<2:
+                            Counter_right=0
+                            Counter_left=0
+                            Counter_forward=0
 
-                    #cv2.imshow('Head Pose Estimation', image)
-                    return image
+                            counter_down= 1 - counter_down  
+                            if counter_down == 0:
+                                Counter_down = 0
+
+                            #cv2.putText(image, text, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            #voice_down.play()
+
+                        frame_height, frame_width= image.shape[:2] 
+
+                        if results.multi_face_landmarks:
+                            mesh_coords = landmarksDetection(image, results, False)
+                            ratio = blinkRatio(image, mesh_coords, RIGHT_EYE, LEFT_EYE)
+                            Mouth_ratio= MouthRatio(image, mesh_coords, UPPER_LIPS, LOWER_LIPS)
+                            #cv2.putText(image, ratio, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            #cv2.putText(frame, f'ratio {ratio}', (100, 100), FONTS, 1.0, utils.GREEN, 2)
+                            #colorBackgroundText(image,  f'Ratio: {round(ratio,2)}', FONTS, 0.7, (30,60),2, PINK, YELLOW)
+                            #colorBackgroundText(image,  f'Ratio Mouth: {round(Mouth_ratio,2)}', FONTS, 0.7, (30,120),2, PINK, YELLOW)
+                            #colorBackgroundText(image,  f'Main Counter: {counter} frames', FONTS, 0.7, (30,60),2, PINK, YELLOW)
+                            colorBackgroundText(image,  f'Eyes Clsoed for: {counter_eye} frames', FONTS, 0.7, (30,90),2, PINK, YELLOW)
+                            colorBackgroundText(image,  f'Mouth Open for: {counter_mouth} frames', FONTS, 0.7, (30,120),2, PINK, YELLOW)
+                            colorBackgroundText(image,  f'Seeing left for: {Counter_left} frames', FONTS, 0.7, (30,150),2, PINK, YELLOW)
+                            colorBackgroundText(image,  f'Seeing right for: {Counter_right} frames', FONTS, 0.7, (30,180),2, PINK, YELLOW)
+                            colorBackgroundText(image,  f'Seeing Down for : {Counter_down} frames', FONTS, 0.7, (30,210),2, PINK, YELLOW)
+
+                            if ratio >4.0:
+                                counter_eye += 1
+                                if counter_eye > 10 and pygame.mixer.get_busy()==0:
+                                    #eyes_blink.play()
+                                    colorBackgroundText(image,  f'Blink', FONTS, 1.7, (int(frame_height/2), 100), 2, YELLOW, pad_x=6, pad_y=6, )
+                                    counter_eye = 0
+                            else: 
+                                counter_eye=0
+                            if Mouth_ratio < 1.5:
+                                counter_mouth += 1
+                                if counter_mouth > 50 and pygame.mixer.get_busy()==0:
+                                    #yawn.play()
+                                    colorBackgroundText(image,  f'Yawn', FONTS, 1.7, (int(frame_height/2), 100), 2, YELLOW, pad_x=6, pad_y=6, )
+                                    counter_mouth = 0
+                            else: 
+                                counter_mouth=0
+
+                #cv2.imshow('Head Pose Estimation', image)
+                return image
     
         
 st.title("Webcam Application")
