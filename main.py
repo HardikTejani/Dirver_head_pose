@@ -323,7 +323,9 @@ class VideoTransformer(VideoTransformerBase):
                 #cv2.imshow('Head Pose Estimation', image)
                 return image
     
-  webrtc_ctx = webrtc_streamer(key="Blazepose", mode=WebRtcMode.SENDRECV, client_settings=WEBRTC_CLIENT_SETTINGS, video_transformer_factory=VideoTransformer,async_transform=True,)
+
+    
+webrtc_streamer(key="headpose", mode=WebRtcMode.SENDRECV, client_settings=WEBRTC_CLIENT_SETTINGS, video_transformer_factory=VideoTransformer,async_transform=True,)
 
 
 
