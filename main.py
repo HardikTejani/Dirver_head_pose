@@ -283,11 +283,12 @@ class VideoTransformer(VideoProcessorBase):
                             #colorBackgroundText(image,  f'Ratio: {round(ratio,2)}', FONTS, 0.7, (30,60),2, PINK, YELLOW)
                             #colorBackgroundText(image,  f'Ratio Mouth: {round(Mouth_ratio,2)}', FONTS, 0.7, (30,120),2, PINK, YELLOW)
                             #colorBackgroundText(image,  f'Main Counter: {counter} frames', FONTS, 0.7, (30,60),2, PINK, YELLOW)
-                            colorBackgroundText(image,  f'Eyes Clsoed for: {counter_eye} frames', FONTS, 0.7, (30,90),2, PINK, YELLOW)
-                            colorBackgroundText(image,  f'Mouth Open for: {counter_mouth} frames', FONTS, 0.7, (30,120),2, PINK, YELLOW)
-                            colorBackgroundText(image,  f'Seeing left for: {Counter_left} frames', FONTS, 0.7, (30,150),2, PINK, YELLOW)
-                            colorBackgroundText(image,  f'Seeing right for: {Counter_right} frames', FONTS, 0.7, (30,180),2, PINK, YELLOW)
-                            colorBackgroundText(image,  f'Seeing Down for : {Counter_down} frames', FONTS, 0.7, (30,210),2, PINK, YELLOW)
+                            cv2.putText(image, Mouth_ratio , (95,12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+#                             colorBackgroundText(image,  f'Eyes Clsoed for: {counter_eye} frames', FONTS, 0.7, (30,90),2, PINK, YELLOW)
+#                             colorBackgroundText(image,  f'Mouth Open for: {counter_mouth} frames', FONTS, 0.7, (30,120),2, PINK, YELLOW)
+#                             colorBackgroundText(image,  f'Seeing left for: {Counter_left} frames', FONTS, 0.7, (30,150),2, PINK, YELLOW)
+#                             colorBackgroundText(image,  f'Seeing right for: {Counter_right} frames', FONTS, 0.7, (30,180),2, PINK, YELLOW)
+#                             colorBackgroundText(image,  f'Seeing Down for : {Counter_down} frames', FONTS, 0.7, (30,210),2, PINK, YELLOW)
 
                             if ratio >4.0:
                                 counter_eye += 1
